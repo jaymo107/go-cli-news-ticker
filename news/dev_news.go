@@ -1,12 +1,16 @@
 package news
 
-type DevToSource struct{}
+type DevToSource struct {
+	topStoriesUrl string
+	maxStories    int
+}
 
-var (
-	topStoriesUrl = "https://hacker-news.firebaseio.com/v0/topstories.json"
-	itemUrl       = "https://hacker-news.firebaseio.com/v0/item/%d.json"
-	maxStories    = 10
-)
+func NewDevToSource() *DevToSource {
+	return &DevToSource{
+		topStoriesUrl: "https://dev.to/api/articles",
+		maxStories:    10,
+	}
+}
 
 func (s *DevToSource) GetNews() ([]Story, error) {
 	return []Story{}, nil
