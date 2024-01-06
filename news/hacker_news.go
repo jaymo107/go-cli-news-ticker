@@ -9,16 +9,22 @@ import (
 	"github.com/jaymo107/go-cli-news-ticker/helpers"
 )
 
-type HackerNewsSource struct{}
+type HackerNewsSource struct {
+	topStoriesUrl string
+	itemUrl       string
+	maxStories    int
+}
 
-var (
-	topStoriesUrl = "https://hacker-news.firebaseio.com/v0/topstories.json"
-	itemUrl       = "https://hacker-news.firebaseio.com/v0/item/%d.json"
-	maxStories    = 10
-)
+func NewHackerNews() *HackerNewsSource {
+	return &HackerNewsSource{
+		topStoriesUrl: "https://hacker-news.firebaseio.com/v0/topstories.json",
+		itemUrl:       "https://hacker-news.firebaseio.com/v0/item/%d.json",
+		maxStories:    10,
+	}
+}
 
 func (s *HackerNewsSource) GetNews() ([]Story, error) {
-	storyIds, err := getTopStoryIds()
+	storyIds, err := s.getTopStoryIds()
 
 	var (
 		stories []Story
@@ -35,7 +41,7 @@ func (s *HackerNewsSource) GetNews() ([]Story, error) {
 
 		go func(id int) {
 			defer wg.Done()
-			story, _ := getStory(id)
+			story, _ := s.getStory(id)
 			mutex.Lock()
 			stories = append(stories, *story)
 			mutex.Unlock()
@@ -47,8 +53,8 @@ func (s *HackerNewsSource) GetNews() ([]Story, error) {
 	return stories, nil
 }
 
-func getStory(storyId int) (*Story, error) {
-	resp, err := helpers.GetJson(fmt.Sprintf(itemUrl, storyId))
+func (s *HackerNewsSource) getStory(storyId int) (*Story, error) {
+	resp, err := helpers.GetJson(fmt.Sprintf(s.itemUrl, storyId))
 
 	if err != nil {
 		return nil, err
@@ -60,8 +66,8 @@ func getStory(storyId int) (*Story, error) {
 	return &story, nil
 }
 
-func getTopStoryIds() ([]int, error) {
-	resp, err := helpers.GetJson(topStoriesUrl)
+func (s *HackerNewsSource) getTopStoryIds() ([]int, error) {
+	resp, err := helpers.GetJson(s.topStoriesUrl)
 
 	if err != nil {
 		return nil, err
@@ -69,7 +75,7 @@ func getTopStoryIds() ([]int, error) {
 
 	var topStoryIds []int
 	json.Unmarshal(resp, &topStoryIds)
-	storyIds := randomiseTopStories(topStoryIds, maxStories)
+	storyIds := randomiseTopStories(topStoryIds, s.maxStories)
 
 	return storyIds, nil
 }

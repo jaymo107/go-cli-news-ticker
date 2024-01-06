@@ -1,7 +1,8 @@
 package news
 
 var sources = []NewsGetter{
-	&HackerNewsSource{},
+	NewHackerNews(),
+	&DevToSource{},
 }
 
 type NewsGetter interface {
