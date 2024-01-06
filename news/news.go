@@ -3,6 +3,7 @@ package news
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"sync"
 
 	"github.com/jaymo107/go-cli-news-ticker/helpers"
@@ -11,6 +12,7 @@ import (
 const (
 	topStoriesUrl = "https://hacker-news.firebaseio.com/v0/topstories.json"
 	itemUrl       = "https://hacker-news.firebaseio.com/v0/item/%d.json"
+	maxStories    = 10
 )
 
 func GetNews() ([]Story, error) {
@@ -65,7 +67,19 @@ func getTopStoryIds() ([]int, error) {
 
 	var topStoryIds []int
 	json.Unmarshal(resp, &topStoryIds)
-	storyIds := topStoryIds[:5]
+	storyIds := randomiseTopStories(topStoryIds, maxStories)
 
 	return storyIds, nil
+}
+
+func randomiseTopStories(ids []int, max int) []int {
+	length := len(ids)
+	randomIds := make([]int, max)
+
+	for i := 0; i < len(randomIds); i++ {
+		index := rand.Intn(length)
+		randomIds[i] = ids[index]
+	}
+
+	return randomIds
 }
