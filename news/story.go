@@ -7,9 +7,10 @@ import (
 )
 
 type Story struct {
-	Time  int    `json:"time"`
-	Title string `json:"title"`
-	Url   string `json:"url"`
+	Time               int    `json:"time"`
+	Title              string `json:"title"`
+	Url                string `json:"url"`
+	PublishedTimestamp string `json:"published_timestamp"`
 }
 
 func (s *Story) String() string {

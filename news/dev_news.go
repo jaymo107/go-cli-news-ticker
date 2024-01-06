@@ -1,5 +1,11 @@
 package news
 
+import (
+	"encoding/json"
+
+	"github.com/jaymo107/go-cli-news-ticker/helpers"
+)
+
 type DevToSource struct {
 	topStoriesUrl string
 	maxStories    int
@@ -13,5 +19,11 @@ func NewDevToSource() *DevToSource {
 }
 
 func (s *DevToSource) GetNews() ([]Story, error) {
-	return []Story{}, nil
+	if resp, err := helpers.GetJson(s.topStoriesUrl); err == nil {
+		var stories []Story
+		json.Unmarshal(resp, &stories)
+		return stories, nil
+	} else {
+		return nil, err
+	}
 }

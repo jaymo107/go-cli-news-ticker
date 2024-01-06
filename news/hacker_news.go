@@ -54,30 +54,25 @@ func (s *HackerNewsSource) GetNews() ([]Story, error) {
 }
 
 func (s *HackerNewsSource) getStory(storyId int) (*Story, error) {
-	resp, err := helpers.GetJson(fmt.Sprintf(s.itemUrl, storyId))
-
-	if err != nil {
+	if resp, err := helpers.GetJson(fmt.Sprintf(s.itemUrl, storyId)); err == nil {
+		var story Story
+		json.Unmarshal(resp, &story)
+		return &story, nil
+	} else {
 		return nil, err
 	}
-
-	var story Story
-	json.Unmarshal(resp, &story)
-
-	return &story, nil
 }
 
 func (s *HackerNewsSource) getTopStoryIds() ([]int, error) {
-	resp, err := helpers.GetJson(s.topStoriesUrl)
-
-	if err != nil {
+	if resp, err := helpers.GetJson(s.topStoriesUrl); err == nil {
 		return nil, err
+	} else {
+		var topStoryIds []int
+		json.Unmarshal(resp, &topStoryIds)
+		storyIds := randomiseTopStories(topStoryIds, s.maxStories)
+
+		return storyIds, nil
 	}
-
-	var topStoryIds []int
-	json.Unmarshal(resp, &topStoryIds)
-	storyIds := randomiseTopStories(topStoryIds, s.maxStories)
-
-	return storyIds, nil
 }
 
 func randomiseTopStories(ids []int, max int) []int {
