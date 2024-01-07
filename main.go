@@ -28,7 +28,7 @@ func main() {
 			if stories, err := news.GetNews(); err == nil {
 				printNews(stories)
 			} else {
-				fmt.Println("failed to get news")
+				fmt.Println("failed to get news", err)
 			}
 		}
 	}

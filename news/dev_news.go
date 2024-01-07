@@ -2,6 +2,7 @@ package news
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/jaymo107/go-cli-news-ticker/helpers"
 )
@@ -30,8 +31,13 @@ func (s *DevToSource) GetNews() ([]Story, error) {
 		json.Unmarshal(resp, &responses)
 		stories := []Story{}
 		for _, response := range responses {
+			parsedDate, err := response.getParsedDate()
+			if err != nil {
+				return nil, err
+			}
+
 			stories = append(stories, Story{
-				Time:  0, // TODO: Parse this properly
+				Time:  parsedDate,
 				Title: response.Title,
 				Url:   response.Url,
 			})
@@ -39,5 +45,14 @@ func (s *DevToSource) GetNews() ([]Story, error) {
 		return stories, nil
 	} else {
 		return nil, err
+	}
+}
+
+func (r *DevToSourceResponse) getParsedDate() (int, error) {
+	format := "2006-01-02T15:04:05Z"
+	if parsed, err := time.Parse(format, r.PublishedTimestamp); err == nil {
+		return int(parsed.Unix()), nil
+	} else {
+		return 0, err
 	}
 }
