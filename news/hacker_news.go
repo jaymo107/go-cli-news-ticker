@@ -15,6 +15,12 @@ type HackerNewsSource struct {
 	maxStories    int
 }
 
+type HackerNewsSourceResponse struct {
+	Time  int    `json:"time"`
+	Title string `json:"title"`
+	Url   string `json:"url"`
+}
+
 func NewHackerNews() *HackerNewsSource {
 	return &HackerNewsSource{
 		topStoriesUrl: "https://hacker-news.firebaseio.com/v0/topstories.json",
@@ -26,15 +32,15 @@ func NewHackerNews() *HackerNewsSource {
 func (s *HackerNewsSource) GetNews() ([]Story, error) {
 	storyIds, err := s.getTopStoryIds()
 
+	if err != nil {
+		return nil, err
+	}
+
 	var (
 		stories []Story
 		mutex   sync.Mutex
 		wg      sync.WaitGroup
 	)
-
-	if err != nil {
-		return nil, err
-	}
 
 	for _, storyId := range storyIds {
 		wg.Add(1)
@@ -55,8 +61,9 @@ func (s *HackerNewsSource) GetNews() ([]Story, error) {
 
 func (s *HackerNewsSource) getStory(storyId int) (*Story, error) {
 	if resp, err := helpers.GetJson(fmt.Sprintf(s.itemUrl, storyId)); err == nil {
-		var story Story
-		json.Unmarshal(resp, &story)
+		var response HackerNewsSourceResponse
+		json.Unmarshal(resp, &response)
+		story := Story(response)
 		return &story, nil
 	} else {
 		return nil, err
@@ -64,7 +71,7 @@ func (s *HackerNewsSource) getStory(storyId int) (*Story, error) {
 }
 
 func (s *HackerNewsSource) getTopStoryIds() ([]int, error) {
-	if resp, err := helpers.GetJson(s.topStoriesUrl); err == nil {
+	if resp, err := helpers.GetJson(s.topStoriesUrl); err != nil {
 		return nil, err
 	} else {
 		var topStoryIds []int
