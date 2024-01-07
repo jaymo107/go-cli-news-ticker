@@ -33,5 +33,9 @@ func GetTimeAgo(unixTime int64) string {
 		}
 	}
 
+	if result == "" {
+		return "just now"
+	}
+
 	return result + " ago"
 }
