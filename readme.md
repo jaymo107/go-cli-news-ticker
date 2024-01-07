@@ -14,7 +14,7 @@ Please enter your choice below then press enter:
 
 #### Todo
 - [x] Add hacker news source.
-- [ ] Add Dev.to source.
+- [x] Add Dev.to source.
 - [ ] Add tests.
 
 Shoutout to the [Hacker News API](https://github.com/HackerNews/API) for making this easy!

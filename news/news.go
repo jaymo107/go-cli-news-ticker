@@ -1,5 +1,7 @@
 package news
 
+import "sort"
+
 var sources = []NewsGetter{
 	NewHackerNews(),
 	NewDevToSource(),
@@ -10,7 +12,7 @@ type NewsGetter interface {
 }
 
 func GetNews() ([]Story, error) {
-	var stories []Story
+	var stories Stories
 
 	for _, source := range sources {
 		if sourceStories, err := source.GetNews(); err == nil {
@@ -19,6 +21,8 @@ func GetNews() ([]Story, error) {
 			return nil, err
 		}
 	}
+
+	sort.Sort(stories)
 
 	return stories, nil
 }
